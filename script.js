@@ -1,78 +1,64 @@
-const audio14 = new Audio('sound/14S.mp3');
-const audio24 = new Audio('sound/24S.mp3');
-const buzzer = new Audio('sound/BUZZER.mp3'); // Add the buzzer sound
-const countdownDisplay = document.getElementById('countdown-display');
-let currentAudio = null;
-let isPaused = false;
-let countdownInterval = null; // Interval for the countdown logic
 
-function playAudio(audio, seconds) {
-    stopAudios();
-    currentAudio = audio;
-    currentAudio.play();
-    // Immediately update the countdown display with the audio's duration.
-    countdownDisplay.textContent = currentAudio.duration.toFixed(2); // 顯示兩位小數點以下的數字
-    countdownInterval = setInterval(updateCountdownDisplay, 100); // Update more frequently for accuracy
-}
+// 定義一個 timer 变量來跟踪倒數計時器
+let timer;
 
-function stopAudios() {
-    clearInterval(countdownInterval); // Clear interval when stopping
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-        currentAudio = null;
-    }
-    countdownDisplay.textContent = '';
-}
+// DOM 元素的引用
+const timeLeft = document.querySelector('.display__time-left');
+const endTime = document.querySelector('.display__end-time');
+const buttons = document.querySelectorAll('.timer__button');
+const customForm = document.getElementById('custom');
 
-function updateCountdownDisplay() {
-    // Calculate the remaining time based on the audio's duration and current time.
-    let remainingTime = currentAudio.duration - currentAudio.currentTime;
-    countdownDisplay.textContent = remainingTime.toFixed(2); // 顯示兩位小數點以下的數字
+// 設定定時器
+function startTimer(seconds) {
+    // 清除之前的定時器
+    clearInterval(timer);
 
-    // If the audio is about to finish, we handle the ending here.
-    if (remainingTime <= 0) {
-        clearInterval(countdownInterval); // Stop the interval
-        currentAudio = null; // Reset the current audio
-        // The buzzer should play here only if it is not already playing.
-        if (buzzer.paused) {
-            buzzer.play(); // Play the buzzer sound
+    const now = Date.now();
+    const then = now + seconds * 1000;
+    displayTimeLeft(seconds);  // 初始時間顯示
+    displayEndTime(then);      // 顯示結束時間
+
+    timer = setInterval(() => {
+        const secondsLeft = Math.round((then - Date.now()) / 1000);
+
+        // 如果時間到了，清除定時器
+        if (secondsLeft < 0) {
+            clearInterval(timer);
+            return;
         }
-        countdownDisplay.textContent = '時間到！';
-    } else if (isPaused) {
-        countdownDisplay.textContent = remainingTime.toFixed(2) + " (暫停)"; // 也顯示兩位小數點以下的數字
-    }
+
+        // 否則，更新時間
+        displayTimeLeft(secondsLeft);
+    }, 1000);
 }
 
-
-function togglePause() {
-    if (!currentAudio) return;
-
-    if (!isPaused) {
-        currentAudio.pause();
-        isPaused = true;
-        countdownDisplay.textContent += " (暫停)";
-
-    } else {
-        currentAudio.play();
-        isPaused = false;
-    }
+// 顯示剩餘時間
+function displayTimeLeft(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainderSeconds = seconds % 60;
+    const display = `${minutes}:${remainderSeconds < 10 ? '0' : ''}${remainderSeconds}`;
+    timeLeft.textContent = display;
+    document.title = display;  // 更新標簽頁標題
 }
 
-document.getElementById('btn-reset').addEventListener('click', () => {
-    stopAudios();
-    clearInterval(countdownInterval); // Ensure the countdown is cleared
-    countdownDisplay.textContent = '已重置'; // Display the reset message
-    isPaused = false;
-    totalSeconds = 0; // Reset the total seconds
-});
+// 顯示結束時間
+function displayEndTime(timestamp) {
+    const end = new Date(timestamp);
+    const hour = end.getHours();
+    const adjustedHour = hour > 12 ? hour - 12 : hour;  // 轉換為 12 小時制
+    const minutes = end.getMinutes();
+    endTime.textContent = `返回於 ${adjustedHour}:${minutes < 10 ? '0' : ''}${minutes}`;
+}
 
-document.getElementById('btn-pause').addEventListener('click', togglePause);
+// 監聽點擊事件
+buttons.forEach(button => button.addEventListener('click', function () {
+    startTimer(parseInt(this.dataset.time));
+}));
 
-document.getElementById('btn-14').addEventListener('click', () => {
-    playAudio(audio14);
-});
-
-document.getElementById('btn-24').addEventListener('click', () => {
-    playAudio(audio24);
+// 監聽自定義表單提交事件
+customForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const mins = this.minutes.value;
+    startTimer(mins * 60);
+    this.reset();
 });

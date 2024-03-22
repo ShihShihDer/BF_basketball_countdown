@@ -1,34 +1,100 @@
-body, html {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    background-color: #f3f3f3;
-}
-
-#timer {
+/* 根據所提供的樣式進行了一些簡化和調整，以保證在不同設備上的兼容性。 */
+html {
+    box-sizing: border-box;
+    font-size: 62.5%; /* 10px */
+    background: linear-gradient(45deg,  #42a5f5 0%, #478ed1 50%, #0d47a1 100%);
+  }
+  
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+  
+  body {
+    margin: 0;
     text-align: center;
-}
-
-button {
-    width: 100px;
-    height: 50px;
-    margin: 10px;
-    font-size: 20px;
+    font-family: 'Inconsolata', monospace;
+    padding: 5rem 0;
+  }
+  
+  .display__time-left {
+    font-weight: 100;
+    font-size: 20rem;
+    margin: 0;
+    color: white;
+    text-shadow: 4px 4px 0 rgba(0,0,0,0.05);
+  }
+  
+  .timer {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .timer__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  
+  .timer__controls > * {
+    flex: 1 1 100px;
+    padding: 1rem;
+  }
+  
+  .timer__controls input {
+    width: 100%;
+    border: none;
+    padding: 2rem;
+  }
+  
+  .timer__button {
+    background: none;
+    border: none;
     cursor: pointer;
-}
-
-#countdown-display {
-    margin-top: 20px;
-    font-size: 40px;
-    color: #333;
-}
-
-#btn-pause, #btn-reset {
-    width: 100px;
-    height: 50px;
-    margin: 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
+    color: white;
+    font-size: 2rem;
+    text-transform: uppercase;
+    background: rgba(0,0,0,0.1);
+    border-bottom: 3px solid rgba(0,0,0,0.2);
+    border-right: 1px solid rgba(0,0,0,0.2);
+  }
+  
+  .timer__button:hover,
+  .timer__button:focus {
+    background: rgba(0,0,0,0.2);
+    outline: 0;
+    }
+    
+    .display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    }
+    
+    .display__end-time {
+    font-size: 4rem;
+    color: white;
+    }
+    
+    @media (max-width: 600px) {
+    .timer__controls {
+    flex-direction: column;
+    }
+    
+    .timer__button,
+    .timer__controls input {
+    width: 100%;
+    }
+    
+    .display__time-left {
+    font-size: 10rem;
+    }
+    
+    .display__end-time {
+    font-size: 2rem;
+    }
+    }
